@@ -55,6 +55,35 @@ This will start all services in development mode, with proper volume mounting fo
 4. The **Scraper-Instance** runs a mock scrape task and returns a message
 5. The **Scraper-Dashboard** displays this message in its console
 
+## Recent Updates
+
+### Improved Container Lifecycle Management
+
+The system has been enhanced with the following improvements:
+
+- **Self-Removing Containers**: Scraper-Instance containers now remove themselves after task completion
+- **Resource Efficiency**: Optimized memory and CPU usage by ensuring containers are fully removed
+- **Simplified Workflow**: Streamlined the scraper instance to send Hello World messages and results
+- **Improved Communication**: Enhanced message relay between components for better visibility
+
+### Technical Implementation Details
+
+- Docker socket mounting allows containers to remove themselves using the Docker API
+- Containers use curl to make API calls to the Docker daemon
+- The Manager stores messages and provides an endpoint for the Dashboard to retrieve them
+- The Dashboard polls for messages and displays them in real-time
+
+## Next Steps
+
+### Environment Variable Configuration
+
+We are planning to implement a unified environment variable configuration system that will:
+
+1. Allow configuration of all components from a single `.env` file in the root directory
+2. Propagate environment variables to all containers automatically
+3. Support dynamic port configuration for both frontend and backend services
+4. Enable easier deployment across different environments
+
 ## Environment Variables
 
 Key environment variables are stored in the `.env` file:
