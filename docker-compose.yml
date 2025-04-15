@@ -10,12 +10,14 @@ services:
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     volumes:
-      - //./pipe/docker_engine:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
       - ./Scraper-Manager:/app
     environment:
       - ENVIRONMENT=development
     networks:
       - scraper-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   scraper-dashboard:
     build:
@@ -29,6 +31,16 @@ services:
       - ./Scraper-Dashboard:/app
     depends_on:
       - scraper-manager
+    networks:
+      - scraper-network
+
+  # Scraper-Instance template (not started by default)
+  scraper-instance:
+    build:
+      context: ./Scraper-Instance
+      dockerfile: Dockerfile
+    image: scraper-instance:latest
+    profiles: ["manual"]  # This prevents it from starting automatically
     networks:
       - scraper-network
 
