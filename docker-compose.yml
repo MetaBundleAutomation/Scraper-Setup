@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  scraper-manager:
+    build:
+      context: ./Scraper-Manager
+      dockerfile: Dockerfile
+    container_name: scraper-manager
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - //./pipe/docker_engine:/var/run/docker.sock
+      - ./Scraper-Manager:/app
+    environment:
+      - ENVIRONMENT=development
+    networks:
+      - scraper-network
+
+  scraper-dashboard:
+    build:
+      context: ./Scraper-Dashboard
+      dockerfile: Dockerfile
+    container_name: scraper-dashboard
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    volumes:
+      - ./Scraper-Dashboard:/app
+    depends_on:
+      - scraper-manager
+    networks:
+      - scraper-network
+
+networks:
+  scraper-network:
+    driver: bridge
