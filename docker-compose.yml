@@ -53,6 +53,11 @@ services:
       - CONTAINER_MEMORY_LIMIT=${CONTAINER_MEMORY_LIMIT:-256m}
       - CONTAINER_CPU_LIMIT=${CONTAINER_CPU_LIMIT:-0.5}
       - LOG_LEVEL=${LOG_LEVEL:-info}
+    deploy:
+      resources:
+        limits:
+          cpus: '${CONTAINER_CPU_LIMIT:-0.5}'
+          memory: '${CONTAINER_MEMORY_LIMIT:-256m}'
     networks:
       - scraper-network
 
