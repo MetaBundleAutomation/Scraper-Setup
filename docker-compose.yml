@@ -13,11 +13,22 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./Scraper-Manager:/app
     environment:
+      - MANAGER_ID=manager-1
       - ENVIRONMENT=development
       - CONTAINER_PREFIX=${CONTAINER_PREFIX:-scraper-instance}
       - CONTAINER_NETWORK=${CONTAINER_NETWORK:-metabundle-scraper_scraper-network}
       - MAX_CONCURRENT_SCRAPERS=${MAX_CONCURRENT_SCRAPERS:-10}
+      - CONTAINER_MEMORY_LIMIT=${CONTAINER_MEMORY_LIMIT:-256m}
+      - CONTAINER_CPU_LIMIT=${CONTAINER_CPU_LIMIT:-0.5}
       - LOG_LEVEL=${LOG_LEVEL:-info}
+      - MAX_RUNNING_CONTAINERS=${MAX_RUNNING_CONTAINERS:-10}
+      - MIN_WORKER_POOL=${MIN_WORKER_POOL:-2}
+      - MAX_WORKER_POOL=${MAX_WORKER_POOL:-5}
+    deploy:
+      resources:
+        limits:
+          cpus: '${CONTAINER_CPU_LIMIT:-0.5}'
+          memory: '${CONTAINER_MEMORY_LIMIT:-256m}'
     networks:
       - scraper-network
     extra_hosts:
@@ -38,6 +49,50 @@ services:
       - REACT_APP_POLL_INTERVAL=1000
     depends_on:
       - scraper-manager
+    networks:
+      - scraper-network
+
+  scraper-worker-1:
+    build:
+      context: ./Scraper-Instance
+      dockerfile: Dockerfile
+    container_name: scraper-worker-1
+    depends_on:
+      - scraper-manager
+    ports:
+      - "0:8000"
+    environment:
+      - MANAGER_URL=http://scraper-manager:8000
+      - MAX_TASKS=5
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      resources:
+        limits:
+          cpus: '${CONTAINER_CPU_LIMIT:-0.5}'
+          memory: '${CONTAINER_MEMORY_LIMIT:-256m}'
+    networks:
+      - scraper-network
+
+  scraper-worker-2:
+    build:
+      context: ./Scraper-Instance
+      dockerfile: Dockerfile
+    container_name: scraper-worker-2
+    depends_on:
+      - scraper-manager
+    ports:
+      - "0:8000"
+    environment:
+      - MANAGER_URL=http://scraper-manager:8000
+      - MAX_TASKS=5
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      resources:
+        limits:
+          cpus: '${CONTAINER_CPU_LIMIT:-0.5}'
+          memory: '${CONTAINER_MEMORY_LIMIT:-256m}'
     networks:
       - scraper-network
 
